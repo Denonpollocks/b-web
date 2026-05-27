@@ -180,14 +180,16 @@ TSX
 To make it appear in nav, add an entry to `navLinks` in `lib/site.ts`. To make it appear
 in the footer, edit the relevant array in `footerLinks`.
 
-## Wiring the contact form
+## Contact forms (Nodemailer + Gmail)
 
-The form in `components/ContactForm.tsx` is currently client-only — submitting just shows
-the success state. To wire it up:
+Demo, DMCA, and Do Not Sell forms POST to `app/api/contact/route.ts` and send via Gmail.
 
-1. Pick a destination (Resend, Formspree, Postmark, your own API route, etc.).
-2. In `ContactForm.tsx`, replace the `setSubmitted(true)` line with a `fetch()` to your endpoint.
-3. If using a Next.js Route Handler, drop it at `app/api/contact/route.ts`.
+1. Copy `.env.example` to `.env.local`
+2. Create a [Google App Password](https://myaccount.google.com/apppasswords) for the Gmail account that will send mail
+3. Set `GMAIL_USER` and `GMAIL_APP_PASSWORD` in `.env.local`
+4. Optionally set `MAIL_TO_DEMO`, `MAIL_TO_DMCA`, and `MAIL_TO_PRIVACY` (defaults to hello@, dmca@, privacy@becko.app)
+
+On Vercel, add the same variables under **Project → Settings → Environment Variables**.
 
 ## What this site sells
 

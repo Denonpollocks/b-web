@@ -1,8 +1,10 @@
 "use client";
 
-import { useMemo, useState, type ChangeEvent, type FormEvent } from "react";
-import { ArrowRight } from "lucide-react";
+import { useState, type ChangeEvent, type FormEvent } from "react";
+import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { site } from "@/lib/site";
+import { useFormSubmit } from "@/lib/useFormSubmit";
+import { HoneypotField } from "@/components/HoneypotField";
 
 type FormState = {
   fullName: string;
@@ -34,38 +36,8 @@ const initialFormState: FormState = {
 
 export function DmcaForm() {
   const [form, setForm] = useState<FormState>(initialFormState);
-
-  const mailtoHref = useMemo(() => {
-    const subject = `DMCA takedown notice from ${form.fullName || "rights holder"}`;
-    const body = [
-      "DMCA TAKEDOWN NOTICE",
-      "",
-      `Full name: ${form.fullName}`,
-      `Email: ${form.email}`,
-      `Postal address: ${form.postalAddress}`,
-      `Phone: ${form.phone || "Not provided"}`,
-      `Rights holder: ${form.rightsHolder}`,
-      "",
-      "Copyrighted work:",
-      form.copyrightedWork,
-      "",
-      "URL(s) of infringing material:",
-      form.infringingUrls,
-      "",
-      "Additional details:",
-      form.additionalDetails || "None",
-      "",
-      "Good-faith statement: I have a good-faith belief that the use of the material is not authorised by the copyright owner, its agent, or the law.",
-      `Acknowledged: ${form.goodFaith ? "Yes" : "No"}`,
-      "",
-      "Perjury statement: I swear, under penalty of perjury, that the information in this notice is accurate and that I am the rights holder or authorised to act on the rights holder's behalf.",
-      `Acknowledged: ${form.perjury ? "Yes" : "No"}`,
-      "",
-      `Electronic signature: ${form.signature}`,
-    ].join("\n");
-
-    return `mailto:${site.contact.dmcaEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  }, [form]);
+  const [honeypot, setHoneypot] = useState("");
+  const { state, errorMessage, submit, reset } = useFormSubmit();
 
   const handleChange =
     (field: keyof FormState) =>
@@ -77,17 +49,36 @@ export function DmcaForm() {
       setForm((current) => ({ ...current, [field]: value }));
     };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    window.location.href = mailtoHref;
+    const ok = await submit({ type: "dmca", website: honeypot, ...form });
+    if (ok) setForm(initialFormState);
   };
 
+  if (state === "success") {
+    return (
+      <div className="form-card text-center">
+        <CheckCircle2 size={40} className="text-accent-green mx-auto mb-4" />
+        <h2 className="text-2xl mb-2">Notice received</h2>
+        <p className="text-ink-dim text-sm max-w-md mx-auto">
+          Your DMCA notice has been sent to {site.contact.dmcaEmail}. We will review it and
+          respond as required by law.
+        </p>
+        <button type="button" className="btn btn-ghost mt-6" onClick={reset}>
+          Submit another notice
+        </button>
+      </div>
+    );
+  }
+
   return (
-    <form className="form-card" onSubmit={handleSubmit} id="dmca-form">
+    <form className="form-card relative" onSubmit={handleSubmit} id="dmca-form">
+      <HoneypotField value={honeypot} onChange={setHoneypot} />
+
       <h2 className="text-2xl">Submit a DMCA takedown notice</h2>
       <p className="mt-0 text-sm">
-        Complete this form to send a notice to {site.contact.dmcaEmail}. Required fields
-        are marked with *.
+        Complete this form to send a notice to {site.contact.dmcaEmail}. Required fields are
+        marked with *.
       </p>
 
       <Field label="Your full name *" className="mt-5">
@@ -95,6 +86,7 @@ export function DmcaForm() {
           className="form-input"
           type="text"
           required
+          disabled={state === "loading"}
           value={form.fullName}
           onChange={handleChange("fullName")}
         />
@@ -106,6 +98,7 @@ export function DmcaForm() {
             className="form-input"
             type="email"
             required
+            disabled={state === "loading"}
             value={form.email}
             onChange={handleChange("email")}
           />
@@ -114,6 +107,7 @@ export function DmcaForm() {
           <input
             className="form-input"
             type="tel"
+            disabled={state === "loading"}
             value={form.phone}
             onChange={handleChange("phone")}
           />
@@ -125,6 +119,7 @@ export function DmcaForm() {
           className="form-input"
           type="text"
           required
+          disabled={state === "loading"}
           value={form.postalAddress}
           onChange={handleChange("postalAddress")}
         />
@@ -135,6 +130,7 @@ export function DmcaForm() {
           className="form-input"
           type="text"
           required
+          disabled={state === "loading"}
           placeholder="Name of the copyright owner"
           value={form.rightsHolder}
           onChange={handleChange("rightsHolder")}
@@ -145,6 +141,7 @@ export function DmcaForm() {
         <textarea
           className="form-textarea min-h-[100px] resize-y"
           required
+          disabled={state === "loading"}
           value={form.copyrightedWork}
           onChange={handleChange("copyrightedWork")}
         />
@@ -154,6 +151,7 @@ export function DmcaForm() {
         <textarea
           className="form-textarea min-h-[100px] resize-y"
           required
+          disabled={state === "loading"}
           placeholder="One URL per line"
           value={form.infringingUrls}
           onChange={handleChange("infringingUrls")}
@@ -163,6 +161,7 @@ export function DmcaForm() {
       <Field label="Additional details" className="mt-4">
         <textarea
           className="form-textarea min-h-[80px] resize-y"
+          disabled={state === "loading"}
           value={form.additionalDetails}
           onChange={handleChange("additionalDetails")}
         />
@@ -173,12 +172,13 @@ export function DmcaForm() {
           className="mt-1 shrink-0"
           type="checkbox"
           required
+          disabled={state === "loading"}
           checked={form.goodFaith}
           onChange={handleChange("goodFaith")}
         />
         <span className="text-sm text-ink-dim">
-          I have a good-faith belief that the use of the material is not authorised by
-          the copyright owner, its agent, or the law.
+          I have a good-faith belief that the use of the material is not authorised by the
+          copyright owner, its agent, or the law.
         </span>
       </label>
 
@@ -187,13 +187,14 @@ export function DmcaForm() {
           className="mt-1 shrink-0"
           type="checkbox"
           required
+          disabled={state === "loading"}
           checked={form.perjury}
           onChange={handleChange("perjury")}
         />
         <span className="text-sm text-ink-dim">
-          I swear, under penalty of perjury, that the information in this notice is
-          accurate and that I am the rights holder or authorised to act on the rights
-          holder&apos;s behalf.
+          I swear, under penalty of perjury, that the information in this notice is accurate
+          and that I am the rights holder or authorised to act on the rights holder&apos;s
+          behalf.
         </span>
       </label>
 
@@ -202,14 +203,25 @@ export function DmcaForm() {
           className="form-input"
           type="text"
           required
+          disabled={state === "loading"}
           placeholder="Type your full legal name"
           value={form.signature}
           onChange={handleChange("signature")}
         />
       </Field>
 
-      <button type="submit" className="btn btn-primary btn-lg w-full mt-5">
-        Submit notice <ArrowRight size={16} />
+      {errorMessage && (
+        <p className="text-red-400 text-sm mt-4" role="alert">
+          {errorMessage}
+        </p>
+      )}
+
+      <button
+        type="submit"
+        className="btn btn-primary btn-lg w-full mt-5"
+        disabled={state === "loading"}
+      >
+        {state === "loading" ? "Sending…" : "Submit notice"} <ArrowRight size={16} />
       </button>
     </form>
   );

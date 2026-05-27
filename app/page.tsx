@@ -39,7 +39,11 @@ export default function HomePage() {
                 </Link>
               </div>
               <div className="mt-8 flex gap-6 flex-wrap text-ink-mute text-sm">
-                {["14-day free pilot", "Migration handled for you", "No credit card required"].map(
+                {[
+                  "WhatsApp, Instagram & Facebook in one inbox",
+                  "Bookings, finance & CRM in one place",
+                  "Built for multi-brand travel agencies",
+                ].map(
                   (t) => (
                     <span key={t} className="before:content-['✓'] before:text-brand before:font-bold before:mr-1.5">
                       {t}

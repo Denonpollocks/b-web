@@ -1,8 +1,10 @@
 "use client";
 
-import { useMemo, useState, type ChangeEvent, type FormEvent } from "react";
-import { ArrowRight } from "lucide-react";
+import { useState, type ChangeEvent, type FormEvent } from "react";
+import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { site } from "@/lib/site";
+import { useFormSubmit } from "@/lib/useFormSubmit";
+import { HoneypotField } from "@/components/HoneypotField";
 
 const requestTypes = [
   "Do not sell or share my personal information",
@@ -30,22 +32,8 @@ const initialFormState: FormState = {
 
 export function DoNotSellForm() {
   const [form, setForm] = useState<FormState>(initialFormState);
-
-  const mailtoHref = useMemo(() => {
-    const subject = `Privacy rights request: ${form.requestType}`;
-    const body = [
-      "U.S. STATE PRIVACY RIGHTS REQUEST",
-      "",
-      `Full name: ${form.fullName}`,
-      `Email: ${form.email}`,
-      `Request type: ${form.requestType}`,
-      "",
-      "Additional details:",
-      form.additionalDetails || "None",
-    ].join("\n");
-
-    return `mailto:${site.contact.privacyEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  }, [form]);
+  const [honeypot, setHoneypot] = useState("");
+  const { state, errorMessage, submit, reset } = useFormSubmit();
 
   const handleChange =
     (field: keyof FormState) =>
@@ -53,13 +41,32 @@ export function DoNotSellForm() {
       setForm((current) => ({ ...current, [field]: event.target.value }));
     };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    window.location.href = mailtoHref;
+    const ok = await submit({ type: "privacy", website: honeypot, ...form });
+    if (ok) setForm(initialFormState);
   };
 
+  if (state === "success") {
+    return (
+      <div className="form-card text-center">
+        <CheckCircle2 size={40} className="text-accent-green mx-auto mb-4" />
+        <h2 className="text-2xl mb-2">Request received</h2>
+        <p className="text-ink-dim text-sm max-w-md mx-auto">
+          Your privacy request has been sent to {site.contact.privacyEmail}. We will respond
+          within the timeframe required by applicable law.
+        </p>
+        <button type="button" className="btn btn-ghost mt-6" onClick={reset}>
+          Submit another request
+        </button>
+      </div>
+    );
+  }
+
   return (
-    <form className="form-card" onSubmit={handleSubmit} id="do-not-sell-form">
+    <form className="form-card relative" onSubmit={handleSubmit} id="do-not-sell-form">
+      <HoneypotField value={honeypot} onChange={setHoneypot} />
+
       <h2 className="text-2xl">Submit your request</h2>
       <p className="mt-0 text-sm">
         Complete this form to send your request to {site.contact.privacyEmail}. Required fields
@@ -71,6 +78,7 @@ export function DoNotSellForm() {
           className="form-input"
           type="text"
           required
+          disabled={state === "loading"}
           value={form.fullName}
           onChange={handleChange("fullName")}
         />
@@ -81,6 +89,7 @@ export function DoNotSellForm() {
           className="form-input"
           type="email"
           required
+          disabled={state === "loading"}
           value={form.email}
           onChange={handleChange("email")}
         />
@@ -90,6 +99,7 @@ export function DoNotSellForm() {
         <select
           className="form-select"
           required
+          disabled={state === "loading"}
           value={form.requestType}
           onChange={handleChange("requestType")}
         >
@@ -104,13 +114,24 @@ export function DoNotSellForm() {
       <Field label="Additional details (optional)" className="mt-4">
         <textarea
           className="form-textarea min-h-[100px] resize-y"
+          disabled={state === "loading"}
           value={form.additionalDetails}
           onChange={handleChange("additionalDetails")}
         />
       </Field>
 
-      <button type="submit" className="btn btn-primary btn-lg w-full mt-5">
-        Submit request <ArrowRight size={16} />
+      {errorMessage && (
+        <p className="text-red-400 text-sm mt-4" role="alert">
+          {errorMessage}
+        </p>
+      )}
+
+      <button
+        type="submit"
+        className="btn btn-primary btn-lg w-full mt-5"
+        disabled={state === "loading"}
+      >
+        {state === "loading" ? "Sending…" : "Submit request"} <ArrowRight size={16} />
       </button>
     </form>
   );

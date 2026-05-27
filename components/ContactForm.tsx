@@ -1,9 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState, type ChangeEvent, type FormEvent } from "react";
-import { ArrowRight } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useState, type ChangeEvent, type FormEvent } from "react";
+import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { site } from "@/lib/site";
+import { useFormSubmit } from "@/lib/useFormSubmit";
+import { HoneypotField } from "@/components/HoneypotField";
 
 type FormState = {
   firstName: string;
@@ -27,31 +30,16 @@ const initialFormState: FormState = {
   painPoint: "",
 };
 
-export function ContactForm() {
+function ContactFormInner() {
+  const searchParams = useSearchParams();
   const [form, setForm] = useState<FormState>(initialFormState);
+  const [honeypot, setHoneypot] = useState("");
+  const [submittedEmail, setSubmittedEmail] = useState("");
+  const { state, errorMessage, submit, reset } = useFormSubmit();
 
-  const mailtoHref = useMemo(() => {
-    const fullName = `${form.firstName} ${form.lastName}`.trim();
-    const subject = `Becko demo request from ${form.agencyName || fullName || "website lead"}`;
-    const body = [
-      "Hello Becko team,",
-      "",
-      "I'd like to book a demo.",
-      "",
-      `First name: ${form.firstName}`,
-      `Last name: ${form.lastName}`,
-      `Work email: ${form.email}`,
-      `Phone / WhatsApp: ${form.phone || "Not provided"}`,
-      `Agency name: ${form.agencyName}`,
-      `Team size: ${form.teamSize}`,
-      `Brands: ${form.brands}`,
-      "",
-      "Biggest tool pain right now:",
-      form.painPoint || "Not provided",
-    ].join("\n");
-
-    return `mailto:${site.contact.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  }, [form]);
+  const product = searchParams.get("product") ?? undefined;
+  const plan = searchParams.get("plan") ?? undefined;
+  const intent = searchParams.get("intent") ?? undefined;
 
   const handleChange =
     (field: keyof FormState) =>
@@ -59,17 +47,53 @@ export function ContactForm() {
       setForm((current) => ({ ...current, [field]: event.target.value }));
     };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    window.location.href = mailtoHref;
+    const ok = await submit({
+      type: "demo",
+      website: honeypot,
+      ...form,
+      product,
+      plan,
+      intent,
+    });
+    if (ok) {
+      setSubmittedEmail(form.email);
+      setForm(initialFormState);
+    }
   };
 
+  if (state === "success") {
+    return (
+      <div className="form-card text-center">
+        <CheckCircle2 size={40} className="text-accent-green mx-auto mb-4" />
+        <h2 className="text-2xl mb-2">Request received</h2>
+        <p className="text-ink-dim text-sm max-w-md mx-auto">
+          Thanks — we&apos;ve received your demo request and will reply to{" "}
+          <strong className="text-white">{submittedEmail}</strong> shortly.
+        </p>
+        <button type="button" className="btn btn-ghost mt-6" onClick={reset}>
+          Send another request
+        </button>
+      </div>
+    );
+  }
+
   return (
-    <form className="form-card" onSubmit={handleSubmit}>
+    <form className="form-card relative" onSubmit={handleSubmit}>
+      <HoneypotField value={honeypot} onChange={setHoneypot} />
+
       <h2 className="text-2xl">Tell us about your agency</h2>
       <p className="mt-0 text-sm">
-        This opens an email to {site.contact.email} with your details pre-filled.
+        We&apos;ll email you at {site.contact.email} to confirm your demo slot.
       </p>
+
+      {(product || plan) && (
+        <p className="mt-3 text-sm text-brand-light">
+          {product === "messenger" && "Messenger product · "}
+          {plan && `Plan interest: ${plan.replace(/-/g, " ")}`}
+        </p>
+      )}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-5">
         <Field label="First name">
@@ -77,6 +101,7 @@ export function ContactForm() {
             className="form-input"
             type="text"
             required
+            disabled={state === "loading"}
             placeholder="Ada"
             value={form.firstName}
             onChange={handleChange("firstName")}
@@ -87,6 +112,7 @@ export function ContactForm() {
             className="form-input"
             type="text"
             required
+            disabled={state === "loading"}
             placeholder="Lovelace"
             value={form.lastName}
             onChange={handleChange("lastName")}
@@ -100,6 +126,7 @@ export function ContactForm() {
             className="form-input"
             type="email"
             required
+            disabled={state === "loading"}
             placeholder="ada@agency.com"
             value={form.email}
             onChange={handleChange("email")}
@@ -109,6 +136,7 @@ export function ContactForm() {
           <input
             className="form-input"
             type="tel"
+            disabled={state === "loading"}
             placeholder="+1 555 0100"
             value={form.phone}
             onChange={handleChange("phone")}
@@ -121,6 +149,7 @@ export function ContactForm() {
           className="form-input"
           type="text"
           required
+          disabled={state === "loading"}
           placeholder="Wanderlux Travel"
           value={form.agencyName}
           onChange={handleChange("agencyName")}
@@ -131,6 +160,7 @@ export function ContactForm() {
         <Field label="Team size">
           <select
             className="form-select"
+            disabled={state === "loading"}
             value={form.teamSize}
             onChange={handleChange("teamSize")}
           >
@@ -142,7 +172,12 @@ export function ContactForm() {
           </select>
         </Field>
         <Field label="Brands">
-          <select className="form-select" value={form.brands} onChange={handleChange("brands")}>
+          <select
+            className="form-select"
+            disabled={state === "loading"}
+            value={form.brands}
+            onChange={handleChange("brands")}
+          >
             <option>1 brand</option>
             <option>2 - 3 brands</option>
             <option>4 - 10 brands</option>
@@ -154,14 +189,25 @@ export function ContactForm() {
       <Field label="What's the biggest tool-pain right now?" className="mt-4">
         <textarea
           className="form-textarea min-h-[120px] resize-y"
+          disabled={state === "loading"}
           placeholder="e.g. our booking system doesn't talk to our accounting; we lose WhatsApp leads to other agents..."
           value={form.painPoint}
           onChange={handleChange("painPoint")}
         />
       </Field>
 
-      <button type="submit" className="btn btn-primary btn-lg w-full mt-5">
-        Request demo <ArrowRight size={16} />
+      {errorMessage && (
+        <p className="text-red-400 text-sm mt-4" role="alert">
+          {errorMessage}
+        </p>
+      )}
+
+      <button
+        type="submit"
+        className="btn btn-primary btn-lg w-full mt-5"
+        disabled={state === "loading"}
+      >
+        {state === "loading" ? "Sending…" : "Request demo"} <ArrowRight size={16} />
       </button>
       <p className="text-[0.78rem] text-ink-mute mt-3 text-center">
         By submitting, you agree to our{" "}
@@ -175,6 +221,21 @@ export function ContactForm() {
         .
       </p>
     </form>
+  );
+}
+
+export function ContactForm() {
+  return (
+    <Suspense
+      fallback={
+        <div className="form-card">
+          <h2 className="text-2xl">Tell us about your agency</h2>
+          <p className="mt-2 text-sm text-ink-dim">Loading form…</p>
+        </div>
+      }
+    >
+      <ContactFormInner />
+    </Suspense>
   );
 }
 
