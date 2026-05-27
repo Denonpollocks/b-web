@@ -12,15 +12,13 @@ export function Logo({ className }: { className?: string }) {
       )}
     >
       <Image
-        src="/images/w-becko.png"
-        alt=""
-        width={32}
-        height={32}
-        className="h-8 w-auto"
+        src="/images/becko_travel_software.svg"
+        alt="Becko Travel Software"
+        width={100}
+        height={100}
+        className="h-24 w-auto"
         priority
       />
-      <span className="sr-only">Becko</span>
-     
     </Link>
   );
 }

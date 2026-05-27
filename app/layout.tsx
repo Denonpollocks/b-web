@@ -29,6 +29,10 @@ export const metadata: Metadata = {
     template: `%s — ${site.name}`,
   },
   description: site.description,
+  icons: {
+    icon: [{ url: "/images/w-B-logo.png", type: "image/png" }],
+    apple: [{ url: "/images/w-B-logo.png", type: "image/png" }],
+  },
   openGraph: {
     title: `${site.name} — ${site.tagline}`,
     description: site.description,
