@@ -24,7 +24,7 @@ const wa: ChannelTab = {
   id: "wa",
   short: "WhatsApp",
   label: "WhatsApp Business",
-  badge: "Official Cloud API",
+  badge: "WhatsApp Cloud API",
   headline: "WhatsApp that actually scales.",
   blurb:
     "Cloud-hosted by Meta. Templates, broadcasts, deep-links, two-way conversations, and live cost-per-conversation analytics from the Meta Graph API — without running a single server.",
@@ -87,7 +87,7 @@ const fb: ChannelTab = {
     "Login health monitoring (token validity, missing scopes alerts)",
   ],
   requires:
-    "A Facebook Page you admin. Connect Becko as a Meta Tech Provider in 2 clicks.",
+    "A Facebook Page you admin. Connect your Page to Becko in 2 clicks.",
   accent: "#0084FF",
   gradient: "from-[#0084FF]/15 to-[#6c83ff]/10",
   visual: <FacebookViz />,

@@ -6,6 +6,10 @@ export const site = {
   url: "https://becko.app",
   contact: {
     email: "hello@becko.app",
+    privacyEmail: "privacy@becko.app",
+    securityEmail: "security@becko.app",
+    abuseEmail: "abuse@becko.app",
+    dmcaEmail: "dmca@becko.app",
   },
   company: {
     legalName: "BECKO - TRAVEL OS LTD",
@@ -102,8 +106,15 @@ export const footerLinks = {
   ],
   legal: [
     { href: "/privacy", label: "Privacy" },
+    { href: "/do-not-sell", label: "Do not sell" },
+    { href: "/data-processing-addendum", label: "DPA" },
+    { href: "/subprocessors", label: "Subprocessors" },
+    { href: "/gdpr", label: "GDPR" },
     { href: "/cookie-policy", label: "Cookie policy" },
     { href: "/terms", label: "Terms" },
+    { href: "/acceptable-use-policy", label: "Acceptable use" },
+    { href: "/ai-usage-policy", label: "AI usage" },
+    { href: "/copyright-dmca", label: "Copyright & DMCA" },
     { href: "/data-deletion", label: "Data deletion" },
     { href: "/security", label: "Security" },
   ],

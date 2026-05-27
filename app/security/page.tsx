@@ -31,8 +31,11 @@ const sections = [
         <p>
           If you believe you have found a vulnerability or security issue affecting the website,
           please email{" "}
-          <a className="text-brand-light hover:text-white" href={`mailto:${site.contact.email}`}>
-            {site.contact.email}
+          <a
+            className="text-brand-light hover:text-white"
+            href={`mailto:${site.contact.securityEmail}`}
+          >
+            {site.contact.securityEmail}
           </a>
           .
         </p>

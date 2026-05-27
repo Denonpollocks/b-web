@@ -262,7 +262,7 @@ const sections: SectionContent[] = [
   {
     heading: "22. Copyright & DMCA",
     paragraphs: [
-      "Becko complies with the U.S. Digital Millennium Copyright Act (17 U.S.C. §512), the EU Digital Services Act (Article 16), and the UK Electronic Commerce (EC Directive) Regulations 2002. To submit a notice of claimed copyright infringement, see our Copyright & DMCA Policy. Becko maintains a designated agent and a repeat-infringer policy under which accounts that receive two or more substantiated notices within any 12-month period may be terminated.",
+      "Becko complies with the U.S. Digital Millennium Copyright Act (17 U.S.C. §512), the EU Digital Services Act (Article 16), and the UK Electronic Commerce (EC Directive) Regulations 2002. To submit a notice of claimed copyright infringement, see our Copyright & DMCA Policy at /copyright-dmca. Becko maintains a designated agent and a repeat-infringer policy under which accounts that receive two or more substantiated notices within any 12-month period may be terminated.",
     ],
   },
   {

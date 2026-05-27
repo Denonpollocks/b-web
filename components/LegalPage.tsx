@@ -14,7 +14,7 @@ export function LegalPage({
 }: {
   eyebrow: string;
   title: string;
-  description: string;
+  description: React.ReactNode;
   sections: LegalSection[];
 }) {
   return (

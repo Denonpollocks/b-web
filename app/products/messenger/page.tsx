@@ -34,7 +34,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Becko Messenger — Unified WhatsApp, Instagram & Facebook Inbox",
     description:
-      "One inbox for every channel your customers actually use. Built for revenue, with AI flows and Meta-approved compliance.",
+      "One inbox for every channel your customers actually use. Built for revenue, with AI flows and messaging-policy compliance.",
     url: `${site.url}/products/messenger`,
     type: "website",
   },
@@ -102,7 +102,7 @@ const valueProps = [
   {
     icon: ShieldCheck,
     title: "Compliant by default",
-    body: "Meta-approved Tech Provider scopes, automated STOP / opt-out enforcement, configurable data-retention windows and EU residency.",
+    body: "Tech Provider API scopes, automated STOP / opt-out enforcement, configurable data-retention windows and EU residency.",
     accent: "#6c83ff",
   },
 ];
@@ -326,10 +326,6 @@ export default function MessengerProductPage() {
             </div>
             <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-2 text-[0.78rem] text-ink-mute">
               <span className="inline-flex items-center gap-1.5">
-                <ShieldCheck size={14} className="text-brand-light" /> Official
-                Meta Tech Provider
-              </span>
-              <span className="inline-flex items-center gap-1.5">
                 <CheckCircle2 size={14} className="text-accent-green" /> WhatsApp
                 Business API
               </span>
@@ -390,7 +386,7 @@ export default function MessengerProductPage() {
             <Eyebrow icon="📥" variant="tag">The Unified Inbox</Eyebrow>
             <h2 className="mt-3.5">
               Channel-agnostic features.{" "}
-              <span className="gradient-text">Built on Meta's official APIs.</span>
+              <span className="gradient-text">Built on WhatsApp Cloud API & Graph API.</span>
             </h2>
             <p className="mt-3 text-[1.05rem]">
               Everything you need to run a serious messenger operation — without
@@ -582,11 +578,11 @@ export default function MessengerProductPage() {
               <div>
                 <Eyebrow icon="🛡️" variant="tag">Security & compliance</Eyebrow>
                 <h2 className="mt-3.5 text-[1.8rem]">
-                  Meta-approved. EU-hosted. STOP-respecting.
+                  Platform-compliant. EU-hosted. STOP-respecting.
                 </h2>
                 <ul className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-[0.95rem] text-ink-dim">
                   {[
-                    "Meta-approved Tech Provider scopes",
+                    "Tech Provider API scopes",
                     "Automated STOP / opt-out handling",
                     "Configurable data-retention windows",
                     "GDPR-ready (DPA available)",
@@ -682,7 +678,7 @@ export default function MessengerProductPage() {
         </div>
         <div className="text-center mt-8 reveal-on-scroll">
           <Link
-            href="/pricing#messenger"
+            href="#pricing"
             className="text-brand-light hover:text-white text-sm font-semibold inline-flex items-center gap-1.5"
           >
             See full pricing comparison <ArrowRight size={14} />
@@ -722,7 +718,7 @@ export default function MessengerProductPage() {
           ))}
         </div>
 
-        {/* Partner channel logo strip */}
+        {/* Supported channel names */}
         <div className="mt-14 flex flex-wrap justify-center items-center gap-x-10 gap-y-4 opacity-70 reveal-on-scroll">
           {["Meta", "WhatsApp", "Instagram", "Facebook", "TikTok"].map((b) => (
             <span
