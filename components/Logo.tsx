@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/cn";
 
@@ -10,10 +11,16 @@ export function Logo({ className }: { className?: string }) {
         className,
       )}
     >
-      <span className="inline-flex items-center justify-center w-[30px] h-[30px] rounded-lg text-[#04121a] font-black bg-brand-grad shadow-[0_6px_16px_rgba(85,204,225,0.4)]">
-        B
-      </span>
-      Becko
+      <Image
+        src="/images/w-becko.png"
+        alt=""
+        width={32}
+        height={32}
+        className="h-8 w-auto"
+        priority
+      />
+      <span className="sr-only">Becko</span>
+     
     </Link>
   );
 }
